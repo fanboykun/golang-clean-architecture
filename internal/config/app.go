@@ -9,6 +9,8 @@ import (
 	"golang-clean-architecture/internal/usecase"
 
 	"github.com/IBM/sarama"
+	"github.com/danielgtaylor/huma/v2"
+	"github.com/danielgtaylor/huma/v2/adapters/humafiber"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
@@ -19,6 +21,7 @@ import (
 type BootstrapConfig struct {
 	DB       *gorm.DB
 	App      *fiber.App
+	Api      huma.API
 	Log      *logrus.Logger
 	Validate *validator.Validate
 	Config   *viper.Viper
@@ -26,6 +29,21 @@ type BootstrapConfig struct {
 }
 
 func Bootstrap(config *BootstrapConfig) {
+	humaConfig := huma.DefaultConfig("Backend API", "1.0.0")
+	humaConfig.Servers = []*huma.Server{
+		{URL: "http://localhost:" + config.Config.GetString("WEB_PORT")},
+	}
+	// Add security scheme for bearer token
+	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
+		"bearer": {
+			Type:         "http",
+			Scheme:       "bearer",
+			BearerFormat: "JWT",
+			Description:  "Bearer token authentication",
+		},
+	}
+	api := humafiber.New(config.App, humaConfig)
+
 	// setup repositories
 	userRepository := repository.NewUserRepository(config.Log)
 	contactRepository := repository.NewContactRepository(config.Log)
@@ -57,6 +75,7 @@ func Bootstrap(config *BootstrapConfig) {
 
 	routeConfig := route.RouteConfig{
 		App:               config.App,
+		Api:               api,
 		UserController:    userController,
 		ContactController: contactController,
 		AddressController: addressController,
