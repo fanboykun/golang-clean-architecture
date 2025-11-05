@@ -23,6 +23,10 @@ func main() {
 	})
 
 	webPort := viperConfig.GetInt("WEB_PORT")
+	log.Infof("Server starting on port %d", webPort)
+	log.Infof("OpenAPI documentation available at: http://localhost:%d/docs", webPort)
+	log.Infof("OpenAPI spec available at: http://localhost:%d/openapi.json", webPort)
+
 	err := app.Listen(fmt.Sprintf(":%d", webPort))
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
