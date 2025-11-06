@@ -30,10 +30,10 @@ func main() {
 
 	// Add security scheme for basic auth
 	humaConfig.Components.SecuritySchemes = map[string]*huma.SecurityScheme{
-		"basic": {
+		"bearer": {
 			Type:        "http",
-			Scheme:      "basic",
-			Description: "Basic authentication",
+			Scheme:      "bearer",
+			Description: "Bearer token authentication",
 		},
 	}
 
