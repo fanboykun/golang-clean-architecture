@@ -62,8 +62,8 @@ run:
 	@echo "Waiting for containers to be ready..."
 	@sleep 5
 	@make migrate-up
-	@echo "Starting API and Worker..."
-	@make -j2 run-web run-worker
+# 	@echo "Starting API and Worker..."
+# 	@make -j2 run-web run-worker
 
 clean:
 	@echo "Cleaning up..."
